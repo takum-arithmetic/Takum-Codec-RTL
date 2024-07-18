@@ -1,0 +1,80 @@
+rule:
+  global:
+    case: lower
+    indent_style: 'smart_tabs'
+    style: no_blank_line
+  architecture_003: # previous line rule
+    style: allow_comment
+  architecture_200:
+    style: require_blank_line
+  block_200: # previous line rule
+    style: allow_comment
+  block_205:
+    style: require_blank_line
+  case_007: # previous line rule
+    style: allow_comment
+  case_010:
+    style: require_blank_line
+  component_003: # previous line rule
+    style: allow_comment
+  component_018:
+    style: require_blank_line
+  constant_200:
+    style: require_blank_line
+  context_003: # previous line rule
+    style: allow_comment
+  context_025:
+    style: require_blank_line
+  entity_003: # previous line rule
+    style: allow_comment
+  entity_203:
+    style: require_blank_line
+  generate_003:
+    style: require_blank_line
+  generate_004: # previous line rule
+    style: allow_comment
+  if_030:
+    style: require_blank_line
+  if_031:
+    style: no_code
+  instantiation_004: # previous line rule
+    style: allow_comment
+  instantiation_019:
+    style: require_blank_line
+  library_003: # previous line rule
+    style: allow_comment
+    allow_library_clause: yes
+  loop_statement_200: # previous line rule
+    style: allow_comment
+  loop_statement_203:
+    style: require_blank_line
+  package_003: # previous line rule
+    style: allow_comment
+  package_body_200: # previous line rule
+    style: allow_comment
+  package_body_203:
+    style: require_blank_line
+  process_011:
+    style: require_blank_line
+  process_015: # previous line rule
+    style: allow_comment
+  signal_200:
+    style: require_blank_line
+  subprogram_body_205:
+    style: require_blank_line
+  type_010: # previous line rule
+    style: allow_comment
+  type_011:
+    style: require_blank_line
+  type_200:
+    style: require_blank_line
+  instantiation_034: # allow entity instantiation
+     method: "entity"
+  length_001: # line length (soft limit)
+    length: 80
+  process_029: # rising_edge style (see https://vhdlwhiz.com/clkevent-vs-rising_edge/)
+    clock: 'edge'
+  signal_007: # default initialization
+    disable: true
+  signal_015: # one signal per line
+    consecutive: 1
