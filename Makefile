@@ -17,7 +17,10 @@ RTL =\
 	rtl/encoder/rounder\
 	rtl/encoder/underflow_overflow_predictor\
 
+SIMULATION =\
+	simulation/decoder/common_decoder_tb\
+
 all:
 
 format:
-	$(VSG) --fix --configuration .vsg-format.yaml --filename $(RTL:=.vhd)
+	$(VSG) --fix --configuration .vsg-format.yaml --filename $(RTL:=.vhd) $(SIMULATION:=.vhd)
