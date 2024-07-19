@@ -51,9 +51,9 @@ begin
 			sign           => sign,
 			characteristic => characteristic,
 			mantissa_bits  => mantissa_bits,
+			precision      => precision,
 			is_zero        => is_zero,
-			is_nar         => is_nar,
-			precision      => precision
+			is_nar         => is_nar
 		);
 
 	-- Reference unit instantiation
@@ -66,9 +66,9 @@ begin
 			sign           => sign_reference,
 			characteristic => characteristic_reference,
 			mantissa_bits  => mantissa_bits_reference,
+			precision      => precision_reference,
 			is_zero        => is_zero_reference,
-			is_nar         => is_nar_reference,
-			precision      => precision_reference
+			is_nar         => is_nar_reference
 		);
 
 	drive_clock : process is
@@ -83,14 +83,7 @@ begin
 		wait;
 	end process drive_clock;
 
-	increment_takum : process (clock) is
-	begin
-		if rising_edge(clock) then
-			takum <= std_ulogic_vector(unsigned(takum) + 1);
-		end if;
-	end process increment_takum;
-
-	check_results : process (clock) is
+	check_results_and_increment_takum : process (clock) is
 	begin
 		if rising_edge(clock) then
 			assert sign = sign_reference
@@ -141,7 +134,9 @@ begin
 				       natural'image(precision_reference) &
 				       ")"
 				severity error;
+
+			takum <= std_ulogic_vector(unsigned(takum) + 1);
 		end if;
-	end process check_results;
+	end process check_results_and_increment_takum;
 
 end architecture behave;
