@@ -36,8 +36,9 @@ architecture rtl of underflow_overflow_predictor is
 	  254
 	);
 begin
+	mantissa_bits_crop <= mantissa_bits(n - 6 downto 6);
 
-	check_characteristic : process (characteristic, mantissa_bits) is
+	check_characteristic : process (characteristic, mantissa_bits_crop) is
 	begin
 		if (n <= 11) then
 			if (characteristic < -characteristic_bound(n)) then
@@ -52,8 +53,6 @@ begin
 				round_up_overflows <= '0';
 			end if;
 		else
-			mantissa_bits_crop <= mantissa_bits(n - 6 downto 6);
-
 			if (mantissa_bits_crop = mantissa_bits_crop_zero) then
 				if (characteristic = -255) then
 					round_down_underflows <= '1';
