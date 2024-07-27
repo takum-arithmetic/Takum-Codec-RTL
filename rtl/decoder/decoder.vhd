@@ -3,28 +3,30 @@ library ieee;
 	use ieee.std_logic_misc.all;
 	use ieee.numeric_std.all;
 
-entity common_decoder is
+entity decoder is
 	generic (
 		n : natural range 2 to natural'high := 16
 	);
 	port (
-		takum          : in    std_ulogic_vector(n - 1 downto 0);
-		sign           : out   std_ulogic;
-		characteristic : out   integer range -255 to 254;
-		mantissa_bits  : out   std_ulogic_vector(n - 6 downto 0);
-		precision      : out   natural range 0 to n - 5;
-		is_zero        : out   std_ulogic;
-		is_nar         : out   std_ulogic
+		takum             : in    std_ulogic_vector(n - 1 downto 0);
+		sign              : out   std_ulogic;
+		logarithmic_value : out   std_ulogic_vector(n + 3 downto 0); -- 9 bits integer, n-5 bits fractional
+		precision         : out   natural range 0 to n - 5;
+		is_zero           : out   std_ulogic;
+		is_nar            : out   std_ulogic
 	);
-end entity common_decoder;
+end entity decoder;
 
-architecture behave of common_decoder is
-	signal prefix                  : std_ulogic_vector(10 downto 0);
-	signal direction_bit           : std_ulogic;
-	signal regime_bits             : std_ulogic_vector(2 downto 0);
-	signal regime                  : natural range 0 to 7;
-	signal characteristic_explicit : natural range 0 to 127;
-	signal precision_internal      : natural range 0 to n - 5;
+architecture behave of decoder is
+	signal prefix                       : std_ulogic_vector(10 downto 0);
+	signal direction_bit                : std_ulogic;
+	signal regime_bits                  : std_ulogic_vector(2 downto 0);
+	signal regime                       : natural range 0 to 7;
+	signal characteristic_explicit      : natural range 0 to 127;
+	signal precision_internal           : natural range 0 to n - 5;
+	signal characteristic               : integer range -255 to 254;
+	signal mantissa_bits                : std_ulogic_vector(n - 6 downto 0);
+	signal characteristic_mantissa_bits : std_ulogic_vector(n + 3 downto 0);
 
 	constant zeros      : std_ulogic_vector(6 downto 0)     := (others => '0');
 	constant takum_zero : std_ulogic_vector(n - 1 downto 0) := (others => '0');
@@ -59,6 +61,11 @@ begin
 	mantissa_bits <= (others => '0') when precision_internal = 0 else
 	                 std_ulogic_vector'(takum(precision_internal - 1 downto 0) & zeros(regime - 1 downto 0));
 
+	-- combine characteristic and mantissa into logarithmic value
+	characteristic_mantissa_bits <= std_ulogic_vector(to_signed(characteristic, 9)) & mantissa_bits;
+	logarithmic_value            <= characteristic_mantissa_bits when takum(n - 1) = '0' else
+	                                std_ulogic_vector(to_signed(-to_integer(signed(characteristic_mantissa_bits)), n + 4));
+
 	-- determine special cases as per definition
 	is_zero <= '1' when takum = takum_zero else
 	           '0';
@@ -66,13 +73,16 @@ begin
 	           '0';
 end architecture behave;
 
-architecture rtl of common_decoder is
+architecture rtl of decoder is
 	signal direction_bit                 : std_ulogic;
 	signal regime_characteristic_segment : std_ulogic_vector(9 downto 0);
 	signal regime_bits                   : std_ulogic_vector(2 downto 0);
 	signal regime                        : natural range 0 to 7;
 	signal antiregime                    : natural range 0 to 7;
 	signal characteristic_raw_bits       : std_ulogic_vector(6 downto 0);
+	signal characteristic                : integer range -255 to 254;
+	signal mantissa_bits                 : std_ulogic_vector(n - 6 downto 0);
+	signal characteristic_mantissa_bits  : std_ulogic_vector(n + 3 downto 0);
 begin
 	sign          <= takum(n - 1);
 	direction_bit <= takum(n - 2);
@@ -106,6 +116,11 @@ begin
 	mantissa_bits <= std_ulogic_vector(shift_left(unsigned(takum(n - 6 downto 0)), regime));
 	precision     <= (n - 5) - regime when regime < n - 5 else
 	                 0;
+
+	-- combine characteristic and mantissa into logarithmic value
+	characteristic_mantissa_bits <= std_ulogic_vector(to_signed(characteristic, 9)) & mantissa_bits;
+	logarithmic_value            <= characteristic_mantissa_bits when takum(n - 1) = '0' else
+	                                std_ulogic_vector(to_signed(-to_integer(signed(characteristic_mantissa_bits)), n + 4));
 
 	detect_special_cases : process (takum) is
 	begin
