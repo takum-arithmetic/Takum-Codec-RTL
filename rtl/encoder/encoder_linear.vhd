@@ -18,24 +18,20 @@ entity encoder_linear is
 end entity encoder_linear;
 
 architecture rtl of encoder_linear is
-	signal characteristic : integer range -255 to 254;
+	signal logarithmic_value : std_ulogic_vector(n + 3 downto 0); -- 9 bits integer, n-5 bits fractional
 begin
-	-- negate the exponent depending on the sign to obtain the
-	-- characteristic
-	characteristic <= exponent when sign = '0' else
-	                  to_integer(signed(not(std_ulogic_vector(to_signed(exponent, 9)))));
+	logarithmic_value <= std_ulogic_vector(to_signed(exponent, 9)) & fraction_bits;
 
-	common_encoder : entity work.common_encoder(rtl)
+	encoder : entity work.encoder(rtl)
 		generic map (
 			n => n
 		)
 		port map (
-			sign           => sign,
-			characteristic => characteristic,
-			mantissa_bits  => fraction_bits,
-			is_zero        => is_zero,
-			is_nar         => is_nar,
-			takum          => takum
+			sign              => sign,
+			logarithmic_value => logarithmic_value,
+			is_zero           => is_zero,
+			is_nar            => is_nar,
+			takum             => takum
 		);
 
 end architecture rtl;

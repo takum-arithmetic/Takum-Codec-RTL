@@ -9,15 +9,15 @@ RTL =\
 	rtl/decoder/characteristic_determinator\
 	rtl/decoder/decoder\
 	rtl/decoder/decoder_linear\
-	rtl/encoder/common_encoder\
+	rtl/encoder/encoder\
 	rtl/encoder/encoder_linear\
-	rtl/encoder/encoder_logarithmic\
 	rtl/encoder/leading_zero_counter_8\
 	rtl/encoder/rounder\
 	rtl/encoder/underflow_overflow_predictor\
 
 SIMULATION =\
 	simulation/decoder/decoder_tb\
+	simulation/encoder/encoder_tb\
 
 all:
 

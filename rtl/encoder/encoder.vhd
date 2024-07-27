@@ -3,31 +3,40 @@ library ieee;
 	use ieee.std_logic_misc.all;
 	use ieee.numeric_std.all;
 
-entity common_encoder is
+entity encoder is
 	generic (
 		n : natural range 2 to natural'high := 16
 	);
 	port (
-		sign           : in    std_ulogic;
-		characteristic : in    integer range -255 to 254;
-		mantissa_bits  : in    std_ulogic_vector(n - 6 downto 0);
-		is_zero        : in    std_ulogic;
-		is_nar         : in    std_ulogic;
-		takum          : out   std_ulogic_vector(n - 1 downto 0)
+		sign              : in    std_ulogic;
+		logarithmic_value : in    std_ulogic_vector(n + 3 downto 0); -- 9 bits integer, n-5 bits fractional
+		is_zero           : in    std_ulogic;
+		is_nar            : in    std_ulogic;
+		takum             : out   std_ulogic_vector(n - 1 downto 0)
 	);
-end entity common_encoder;
+end entity encoder;
 
-architecture rtl of common_encoder is
-	signal direction_bit            : std_ulogic;
-	signal characteristic_precursor : std_ulogic_vector(7 downto 0);
-	signal regime                   : natural range 0 to 7;
-	signal takum_with_rounding_bit  : std_ulogic_vector(n downto 0);
-	signal takum_rounded            : std_ulogic_vector(n - 1 downto 0);
-	signal round_up_overflows       : std_ulogic;
-	signal round_down_underflows    : std_ulogic;
+architecture rtl of encoder is
+	signal direction_bit                : std_ulogic;
+	signal characteristic_mantissa_bits : std_ulogic_vector(n + 3 downto 0);
+	signal characteristic               : integer range -255 to 254;
+	signal mantissa_bits                : std_ulogic_vector(n - 6 downto 0);
+	signal characteristic_precursor     : std_ulogic_vector(7 downto 0);
+	signal regime                       : natural range 0 to 7;
+	signal takum_with_rounding_bit      : std_ulogic_vector(n downto 0);
+	signal takum_rounded                : std_ulogic_vector(n - 1 downto 0);
+	signal round_up_overflows           : std_ulogic;
+	signal round_down_underflows        : std_ulogic;
 begin
 	-- direction bit is 1 when characteristic >= 0 holds
 	direction_bit <= not to_signed(characteristic, 9)(8);
+
+	-- negate the logarithmic value depending on the sign to obtain the
+	-- characteristic and mantissa bits
+	characteristic_mantissa_bits <= logarithmic_value when sign = '0' else
+	                                std_ulogic_vector(to_signed(-to_integer(signed(logarithmic_value)), n + 4));
+	characteristic               <= to_integer(signed(characteristic_mantissa_bits(n + 3 downto n - 5)));
+	mantissa_bits                <= characteristic_mantissa_bits(n - 6 downto 0);
 
 	underflow_overflow_predictor : entity work.underflow_overflow_predictor(rtl)
 		generic map (
