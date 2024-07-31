@@ -7,8 +7,9 @@ include config.mk
 
 RTL =\
 	rtl/decoder/characteristic_determinator\
-	rtl/decoder/decoder\
+	rtl/decoder/common_decoder\
 	rtl/decoder/decoder_linear\
+	rtl/decoder/decoder_logarithmic\
 	rtl/encoder/common_encoder\
 	rtl/encoder/encoder_linear\
 	rtl/encoder/encoder_logarithmic\
@@ -17,7 +18,7 @@ RTL =\
 	rtl/encoder/underflow_overflow_predictor\
 
 SIMULATION =\
-	simulation/decoder/decoder_tb\
+	simulation/decoder/common_decoder_tb\
 
 all:
 

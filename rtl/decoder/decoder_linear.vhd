@@ -19,22 +19,32 @@ entity decoder_linear is
 end entity decoder_linear;
 
 architecture rtl of decoder_linear is
-	signal logarithmic_value : std_ulogic_vector(n + 3 downto 0); -- 9 bits integer, n-5 bits fractional
+	signal sign_internal  : std_ulogic;
+	signal characteristic : integer range -255 to 254;
 begin
 
-	decoder : entity work.decoder(rtl)
+	common_decoder : entity work.common_decoder(rtl)
 		generic map (
 			n => n
 		)
 		port map (
-			takum             => takum,
-			sign              => sign,
-			logarithmic_value => logarithmic_value,
-			precision         => precision,
-			is_zero           => is_zero,
-			is_nar            => is_nar
+			takum          => takum,
+			sign           => sign_internal,
+			characteristic => characteristic,
+			mantissa_bits  => fraction_bits,
+			precision      => precision,
+			is_zero        => is_zero,
+			is_nar         => is_nar
 		);
 
-	exponent      <= to_integer(signed(logarithmic_value(n + 3 downto n - 5)));
-	fraction_bits <= logarithmic_value(n - 6 downto 0);
+	-- output sign
+	sign <= sign_internal;
+
+	-- the exponent is defined as (-1)^sign * (characteristic + sign),
+	-- which means that it's characteristic for sign=0 and
+	-- (-characteristic - 1). However, the latter is just the result
+	-- of the bitwise negation of the corresponding two's complement
+	-- signed integer.
+	exponent <= characteristic when sign_internal = '0' else
+	            to_integer(signed(not(std_ulogic_vector(to_signed(characteristic, 9)))));
 end architecture rtl;

@@ -2,25 +2,27 @@ library ieee;
 	use ieee.std_logic_1164.all;
 	use ieee.numeric_std.all;
 
-entity decoder_tb is
+entity common_decoder_tb is
 	generic (
 		n : natural range 2 to natural'high := 16
 	);
-end entity decoder_tb;
+end entity common_decoder_tb;
 
-architecture behave of decoder_tb is
-	signal clock                       : std_ulogic;
-	signal takum                       : std_ulogic_vector(n - 1 downto 0) := (others => '0');
-	signal sign                        : std_ulogic;
-	signal sign_reference              : std_ulogic;
-	signal logarithmic_value           : std_ulogic_vector(n + 3 downto 0); -- 9 bits integer, n-5 bits fractional
-	signal logarithmic_value_reference : std_ulogic_vector(n + 3 downto 0); -- 9 bits integer, n-5 bits fractional
-	signal is_zero                     : std_ulogic;
-	signal is_zero_reference           : std_ulogic;
-	signal is_nar                      : std_ulogic;
-	signal is_nar_reference            : std_ulogic;
-	signal precision                   : natural range 0 to n - 5;
-	signal precision_reference         : natural range 0 to n - 5;
+architecture behave of common_decoder_tb is
+	signal clock                    : std_ulogic;
+	signal takum                    : std_ulogic_vector(n - 1 downto 0) := (others => '0');
+	signal sign                     : std_ulogic;
+	signal sign_reference           : std_ulogic;
+	signal characteristic           : integer range -255 to 254;
+	signal characteristic_reference : integer range -255 to 254;
+	signal mantissa_bits            : std_ulogic_vector(n - 6 downto 0);
+	signal mantissa_bits_reference  : std_ulogic_vector(n - 6 downto 0);
+	signal is_zero                  : std_ulogic;
+	signal is_zero_reference        : std_ulogic;
+	signal is_nar                   : std_ulogic;
+	signal is_nar_reference         : std_ulogic;
+	signal precision                : natural range 0 to n - 5;
+	signal precision_reference      : natural range 0 to n - 5;
 
 	constant takum_end : std_ulogic_vector(n - 1 downto 0) := (others => '1');
 	function ulogic_vector_to_string (
@@ -40,31 +42,33 @@ architecture behave of decoder_tb is
 begin
 
 	-- UUT instantiation
-	decoder : entity work.decoder(rtl)
+	decoder : entity work.common_decoder(rtl)
 		generic map (
 			n => n
 		)
 		port map (
-			takum             => takum,
-			sign              => sign,
-			logarithmic_value => logarithmic_value,
-			precision         => precision,
-			is_zero           => is_zero,
-			is_nar            => is_nar
+			takum          => takum,
+			sign           => sign,
+			characteristic => characteristic,
+			mantissa_bits  => mantissa_bits,
+			precision      => precision,
+			is_zero        => is_zero,
+			is_nar         => is_nar
 		);
 
 	-- Reference unit instantiation
-	decoder_reference : entity work.decoder(behave)
+	decoder_reference : entity work.common_decoder(behave)
 		generic map (
 			n => n
 		)
 		port map (
-			takum             => takum,
-			sign              => sign_reference,
-			logarithmic_value => logarithmic_value_reference,
-			precision         => precision_reference,
-			is_zero           => is_zero_reference,
-			is_nar            => is_nar_reference
+			takum          => takum,
+			sign           => sign_reference,
+			characteristic => characteristic_reference,
+			mantissa_bits  => mantissa_bits_reference,
+			precision      => precision_reference,
+			is_zero        => is_zero_reference,
+			is_nar         => is_nar_reference
 		);
 
 	drive_clock : process is
@@ -90,12 +94,20 @@ begin
 				       std_ulogic'image(sign_reference) &
 				       ")"
 				severity error;
-			assert logarithmic_value = logarithmic_value_reference
+			assert characteristic = characteristic_reference
 				report ulogic_vector_to_string(takum) &
-				       ": logarithmic value mismatch (rtl logarithmic_value=" &
-				       ulogic_vector_to_string(logarithmic_value) &
-				       ", behave logarithmic_value=" &
-				       ulogic_vector_to_string(logarithmic_value_reference) &
+				       ": characteristic mismatch (rtl characteristic=" &
+				       integer'image(characteristic) &
+				       ", behave characteristic=" &
+				       integer'image(characteristic_reference) &
+				       ")"
+				severity error;
+			assert mantissa_bits = mantissa_bits_reference
+				report ulogic_vector_to_string(takum) &
+				       ": mantissa bits mismatch (rtl mantissa_bits=" &
+				       ulogic_vector_to_string(mantissa_bits) &
+				       ", behave mantissa_bits=" &
+				       ulogic_vector_to_string(mantissa_bits_reference) &
 				       ")"
 				severity error;
 			assert is_zero = is_zero_reference
