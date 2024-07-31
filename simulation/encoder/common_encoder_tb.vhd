@@ -9,18 +9,17 @@ entity common_encoder_tb is
 end entity common_encoder_tb;
 
 architecture behave of common_encoder_tb is
-	signal clock                    : std_ulogic;
-	signal takum                    : std_ulogic_vector(n - 1 downto 0) := (others => '0');
-	signal takum_output             : std_ulogic_vector(n - 1 downto 0);
-	signal sign                     : std_ulogic;
-	signal characteristic           : integer range -255 to 254;
-	signal mantissa_bits            : std_ulogic_vector(n - 6 downto 0);
-	signal is_zero                  : std_ulogic;
-	signal is_nar                   : std_ulogic;
-	signal precision                : natural range 0 to n - 5;
+	signal clock          : std_ulogic;
+	signal takum          : std_ulogic_vector(n - 1 downto 0) := (others => '0');
+	signal takum_output   : std_ulogic_vector(n - 1 downto 0);
+	signal sign_bit       : std_ulogic;
+	signal characteristic : integer range -255 to 254;
+	signal mantissa_bits  : std_ulogic_vector(n - 6 downto 0);
+	signal is_zero        : std_ulogic;
+	signal is_nar         : std_ulogic;
+	signal precision      : natural range 0 to n - 5;
 
 	constant takum_end : std_ulogic_vector(n - 1 downto 0) := (others => '1');
-
 	function ulogic_vector_to_string (
 		input: std_ulogic_vector
 	) return string is
@@ -45,7 +44,7 @@ begin
 		)
 		port map (
 			takum          => takum,
-			sign           => sign,
+			sign_bit       => sign_bit,
 			characteristic => characteristic,
 			mantissa_bits  => mantissa_bits,
 			precision      => precision,
@@ -59,7 +58,7 @@ begin
 			n => n
 		)
 		port map (
-			sign           => sign,
+			sign_bit       => sign_bit,
 			characteristic => characteristic,
 			mantissa_bits  => mantissa_bits,
 			is_zero        => is_zero,
@@ -86,7 +85,7 @@ begin
 				report ulogic_vector_to_string(takum) &
 				       "!=" &
 				       ulogic_vector_to_string(takum_output)
-				       severity error;
+				severity error;
 
 			takum <= std_ulogic_vector(unsigned(takum) + 1);
 		end if;

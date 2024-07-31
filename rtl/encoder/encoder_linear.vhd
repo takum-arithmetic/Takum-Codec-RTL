@@ -8,7 +8,7 @@ entity encoder_linear is
 		n : natural range 2 to natural'high := 16
 	);
 	port (
-		sign          : in    std_ulogic;
+		sign_bit      : in    std_ulogic;
 		exponent      : in    integer range -255 to 254;
 		fraction_bits : in    std_ulogic_vector(n - 6 downto 0);
 		is_zero       : in    std_ulogic;
@@ -20,9 +20,9 @@ end entity encoder_linear;
 architecture rtl of encoder_linear is
 	signal characteristic : integer range -255 to 254;
 begin
-	-- negate the exponent depending on the sign to obtain the
+	-- negate the exponent depending on the sign_bit to obtain the
 	-- characteristic
-	characteristic <= exponent when sign = '0' else
+	characteristic <= exponent when sign_bit = '0' else
 	                  to_integer(signed(not(std_ulogic_vector(to_signed(exponent, 9)))));
 
 	common_encoder : entity work.common_encoder(rtl)
@@ -30,7 +30,7 @@ begin
 			n => n
 		)
 		port map (
-			sign           => sign,
+			sign_bit       => sign_bit,
 			characteristic => characteristic,
 			mantissa_bits  => fraction_bits,
 			is_zero        => is_zero,

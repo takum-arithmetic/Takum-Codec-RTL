@@ -8,7 +8,7 @@ entity encoder_logarithmic is
 		n : natural range 2 to natural'high := 64
 	);
 	port (
-		sign                     : in    std_ulogic;
+		sign_bit                 : in    std_ulogic;
 		barred_logarithmic_value : in    std_ulogic_vector(n + 3 downto 0); -- 9 bits integer, n-5 bits fractional
 		is_zero                  : in    std_ulogic;
 		is_nar                   : in    std_ulogic;
@@ -26,7 +26,7 @@ begin
 			n => n
 		)
 		port map (
-			sign           => sign,
+			sign_bit       => sign_bit,
 			characteristic => to_integer(signed(barred_logarithmic_value(n + 3 downto n - 5))),
 			mantissa_bits  => barred_logarithmic_value(n - 6 downto 0),
 			is_zero        => is_zero,

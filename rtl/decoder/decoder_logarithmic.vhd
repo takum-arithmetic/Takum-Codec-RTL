@@ -9,7 +9,7 @@ entity decoder_logarithmic is
 	);
 	port (
 		takum                    : in    std_ulogic_vector(n - 1 downto 0);
-		sign                     : out   std_ulogic;
+		sign_bit                 : out   std_ulogic;
 		barred_logarithmic_value : out   std_ulogic_vector(n + 3 downto 0); -- 9 bits integer, n-5 bits fractional
 		precision                : out   natural range 0 to n - 5;
 		is_zero                  : out   std_ulogic;
@@ -28,7 +28,7 @@ begin
 		)
 		port map (
 			takum          => takum,
-			sign           => sign,
+			sign_bit       => sign_bit,
 			characteristic => characteristic,
 			mantissa_bits  => mantissa_bits,
 			precision      => precision,

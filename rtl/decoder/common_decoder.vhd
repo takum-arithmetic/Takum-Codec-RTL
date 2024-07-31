@@ -9,7 +9,7 @@ entity common_decoder is
 	);
 	port (
 		takum          : in    std_ulogic_vector(n - 1 downto 0);
-		sign           : out   std_ulogic;
+		sign_bit       : out   std_ulogic;
 		characteristic : out   integer range -255 to 254;
 		mantissa_bits  : out   std_ulogic_vector(n - 6 downto 0);
 		precision      : out   natural range 0 to n - 5;
@@ -31,7 +31,7 @@ architecture behave of common_decoder is
 	constant takum_nar  : std_ulogic_vector(n - 1 downto 0) := (n - 1 => '1', others => '0');
 begin
 	-- Directly output the sign bit
-	sign <= takum(n - 1);
+	sign_bit <= takum(n - 1);
 
 	-- Get 11-bit prefix consisting of the direction bit, 3 regime
 	-- bits and 7 subsequent bits for all possible characteristic
@@ -74,7 +74,7 @@ architecture rtl of common_decoder is
 	signal antiregime                    : natural range 0 to 7;
 	signal characteristic_raw_bits       : std_ulogic_vector(6 downto 0);
 begin
-	sign          <= takum(n - 1);
+	sign_bit      <= takum(n - 1);
 	direction_bit <= takum(n - 2);
 
 	regime_characteristic_segment <= takum(n - 3 downto n - 12) when n >= 12 else

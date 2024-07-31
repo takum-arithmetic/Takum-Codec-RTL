@@ -11,8 +11,8 @@ end entity common_decoder_tb;
 architecture behave of common_decoder_tb is
 	signal clock                    : std_ulogic;
 	signal takum                    : std_ulogic_vector(n - 1 downto 0) := (others => '0');
-	signal sign                     : std_ulogic;
-	signal sign_reference           : std_ulogic;
+	signal sign_bit                 : std_ulogic;
+	signal sign_bit_reference       : std_ulogic;
 	signal characteristic           : integer range -255 to 254;
 	signal characteristic_reference : integer range -255 to 254;
 	signal mantissa_bits            : std_ulogic_vector(n - 6 downto 0);
@@ -48,7 +48,7 @@ begin
 		)
 		port map (
 			takum          => takum,
-			sign           => sign,
+			sign_bit       => sign_bit,
 			characteristic => characteristic,
 			mantissa_bits  => mantissa_bits,
 			precision      => precision,
@@ -63,7 +63,7 @@ begin
 		)
 		port map (
 			takum          => takum,
-			sign           => sign_reference,
+			sign_bit       => sign_bit_reference,
 			characteristic => characteristic_reference,
 			mantissa_bits  => mantissa_bits_reference,
 			precision      => precision_reference,
@@ -86,12 +86,12 @@ begin
 	check_results_and_increment_takum : process (clock) is
 	begin
 		if rising_edge(clock) then
-			assert sign = sign_reference
+			assert sign_bit = sign_bit_reference
 				report ulogic_vector_to_string(takum) &
-				       ": sign mismatch (rtl sign=" &
-				       std_ulogic'image(sign) &
-				       ", behave sign=" &
-				       std_ulogic'image(sign_reference) &
+				       ": sign_bit mismatch (rtl sign_bit=" &
+				       std_ulogic'image(sign_bit) &
+				       ", behave sign_bit=" &
+				       std_ulogic'image(sign_bit_reference) &
 				       ")"
 				severity error;
 			assert characteristic = characteristic_reference

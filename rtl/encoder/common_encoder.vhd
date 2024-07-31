@@ -8,7 +8,7 @@ entity common_encoder is
 		n : natural range 2 to natural'high := 16
 	);
 	port (
-		sign           : in    std_ulogic;
+		sign_bit       : in    std_ulogic;
 		characteristic : in    integer range -255 to 254;
 		mantissa_bits  : in    std_ulogic_vector(n - 6 downto 0);
 		is_zero        : in    std_ulogic;
@@ -75,7 +75,7 @@ begin
 
 		characteristic_mantissa_bits <= std_ulogic_vector(shift_left(unsigned(std_ulogic_vector'(characteristic_bits & mantissa_bits)),
 	                                                             to_integer(unsigned(not std_ulogic_vector(to_unsigned(regime, 3))))));
-		takum_with_rounding_bit      <= sign & direction_bit & regime_bits & characteristic_mantissa_bits(n + 1 downto 6);
+		takum_with_rounding_bit      <= sign_bit & direction_bit & regime_bits & characteristic_mantissa_bits(n + 1 downto 6);
 	end block generate_takum_with_rounding_bit;
 
 	rounder : entity work.rounder(rtl)
