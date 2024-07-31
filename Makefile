@@ -19,6 +19,7 @@ RTL =\
 
 SIMULATION =\
 	simulation/decoder/common_decoder_tb\
+	simulation/encoder/common_encoder_tb\
 
 all:
 
