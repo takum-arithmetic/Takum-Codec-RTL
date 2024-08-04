@@ -114,7 +114,7 @@ begin
 
 	detect_special_cases : process (takum) is
 	begin
-		if (or_reduce(takum(n - 2 downto 0)) = '0') then
+		if (takum(n - 2 downto 0) = (n - 2 downto 0 => '0')) then
 			is_zero <= not takum(n - 1);
 			is_nar  <= takum(n - 1);
 		else
