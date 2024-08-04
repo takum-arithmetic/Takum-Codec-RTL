@@ -142,7 +142,7 @@ begin
 	generate_takum_with_rounding_bit : block is
 		signal regime_bits                  : std_ulogic_vector(2 downto 0);
 		signal characteristic_bits          : std_ulogic_vector(6 downto 0);
-		signal characteristic_mantissa_bits : std_ulogic_vector(n + 1 downto 0);
+		signal characteristic_mantissa_bits : std_ulogic_vector(n + 8 downto 0);
 	begin
 
 		set_regime_and_characteristic_raw_bits : process (direction_bit, regime, characteristic_precursor) is
@@ -156,8 +156,7 @@ begin
 			end if;
 		end process set_regime_and_characteristic_raw_bits;
 
-		characteristic_mantissa_bits <= std_ulogic_vector(shift_left(unsigned(std_ulogic_vector'(characteristic_bits & mantissa_bits)),
-	                                                             to_integer(unsigned(not std_ulogic_vector(to_unsigned(regime, 3))))));
+		characteristic_mantissa_bits <= std_ulogic_vector(shift_right(unsigned(std_ulogic_vector'(characteristic_bits & mantissa_bits & (6 downto 0 => '0'))), regime));
 		takum_with_rounding_bit      <= sign_bit & direction_bit & regime_bits & characteristic_mantissa_bits(n + 1 downto 6);
 	end block generate_takum_with_rounding_bit;
 
