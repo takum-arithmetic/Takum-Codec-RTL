@@ -112,15 +112,14 @@ begin
 	precision     <= (n - 5) - regime when regime < n - 5 else
 	                 0;
 
-	detect_special_cases : process (takum) is
+	detect_special_cases : block is
+		constant takum_zero : std_ulogic_vector(n - 1 downto 0) := (others => '0');
+		constant takum_nar  : std_ulogic_vector(n - 1 downto 0) := (n - 1 => '1', others => '0');
 	begin
-		if (takum(n - 2 downto 0) = (n - 2 downto 0 => '0')) then
-			is_zero <= not takum(n - 1);
-			is_nar  <= takum(n - 1);
-		else
-			is_zero <= '0';
-			is_nar  <= '0';
-		end if;
-	end process detect_special_cases;
+		is_zero <= '1' when takum = takum_zero else
+		           '0';
+		is_nar  <= '1' when takum = takum_nar else
+		           '0';
+	end block detect_special_cases;
 
 end architecture rtl;
