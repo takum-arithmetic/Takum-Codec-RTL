@@ -95,13 +95,18 @@ begin
 
 	characteristic_raw_bits <= regime_characteristic_segment(6 downto 0);
 
-	characteristic_determinator : entity work.characteristic_determinator(rtl)
-		port map (
-			characteristic_raw_bits => characteristic_raw_bits,
-			antiregime              => antiregime,
-			direction_bit           => direction_bit,
-			characteristic          => characteristic
-		);
+	determine_characteristic : block is
+		signal characteristic_raw_normal_bits : std_ulogic_vector(6 downto 0);
+		signal characteristic_precursor       : std_ulogic_vector(8 downto 0);
+		signal characteristic_normal          : std_ulogic_vector(8 downto 0);
+	begin
+		characteristic_raw_normal_bits <= characteristic_raw_bits when direction_bit = '0' else
+	                                  not characteristic_raw_bits;
+		characteristic_precursor       <= std_ulogic_vector(shift_right(signed(std_ulogic_vector'("10" & characteristic_raw_normal_bits)), antiregime));
+		characteristic_normal          <= std_ulogic_vector'("1" & std_ulogic_vector(unsigned(characteristic_precursor(7 downto 0)) + 1));
+		characteristic                 <= to_integer(signed(characteristic_normal)) when direction_bit = '0' else
+	                                  to_integer(signed(not characteristic_normal));
+	end block determine_characteristic;
 
 	mantissa_bits <= std_ulogic_vector(shift_left(unsigned(takum(n - 6 downto 0)), regime));
 	precision     <= (n - 5) - regime when regime < n - 5 else

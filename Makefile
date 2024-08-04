@@ -6,11 +6,10 @@
 include config.mk
 
 RTL =\
-	rtl/decoder/characteristic_determinator\
-	rtl/decoder/common_decoder\
+	rtl/decoder/predecoder\
 	rtl/decoder/decoder_linear\
 	rtl/decoder/decoder_logarithmic\
-	rtl/encoder/common_encoder\
+	rtl/encoder/postencoder\
 	rtl/encoder/encoder_linear\
 	rtl/encoder/encoder_logarithmic\
 	rtl/encoder/leading_zero_counter_8\
