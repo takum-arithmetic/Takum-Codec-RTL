@@ -12,9 +12,6 @@ RTL =\
 	rtl/encoder/postencoder\
 	rtl/encoder/encoder_linear\
 	rtl/encoder/encoder_logarithmic\
-	rtl/encoder/leading_zero_counter_8\
-	rtl/encoder/rounder\
-	rtl/encoder/underflow_overflow_predictor\
 
 SIMULATION =\
 	simulation/decoder/common_decoder_tb\
