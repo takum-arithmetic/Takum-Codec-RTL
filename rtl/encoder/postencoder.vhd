@@ -3,7 +3,7 @@ library ieee;
 	use ieee.std_logic_misc.all;
 	use ieee.numeric_std.all;
 
-entity common_encoder is
+entity postencoder is
 	generic (
 		n : natural range 2 to natural'high := 16
 	);
@@ -15,9 +15,9 @@ entity common_encoder is
 		is_nar         : in    std_ulogic;
 		takum          : out   std_ulogic_vector(n - 1 downto 0)
 	);
-end entity common_encoder;
+end entity postencoder;
 
-architecture rtl of common_encoder is
+architecture rtl of postencoder is
 	signal direction_bit            : std_ulogic;
 	signal characteristic_precursor : std_ulogic_vector(7 downto 0);
 	signal regime                   : natural range 0 to 7;

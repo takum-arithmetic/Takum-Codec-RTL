@@ -21,7 +21,7 @@ begin
 
 	-- the barred logarithmic value is just c + m, i.e. the concatenation
 	-- of the characteristic signed integer bits and the mantissa bits.
-	common_encoder : entity work.common_encoder(rtl)
+	postencoder : entity work.postencoder(rtl)
 		generic map (
 			n => n
 		)

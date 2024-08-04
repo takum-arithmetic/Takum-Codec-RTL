@@ -22,7 +22,7 @@ architecture rtl of decoder_logarithmic is
 	signal mantissa_bits  : std_ulogic_vector(n - 6 downto 0);
 begin
 
-	common_decoder : entity work.common_decoder(rtl)
+	predecoder : entity work.predecoder(rtl)
 		generic map (
 			n => n
 		)

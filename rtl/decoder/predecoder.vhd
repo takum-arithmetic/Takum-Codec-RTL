@@ -3,7 +3,7 @@ library ieee;
 	use ieee.std_logic_misc.all;
 	use ieee.numeric_std.all;
 
-entity common_decoder is
+entity predecoder is
 	generic (
 		n : natural range 2 to natural'high := 16
 	);
@@ -16,9 +16,9 @@ entity common_decoder is
 		is_zero        : out   std_ulogic;
 		is_nar         : out   std_ulogic
 	);
-end entity common_decoder;
+end entity predecoder;
 
-architecture behave of common_decoder is
+architecture behave of predecoder is
 	signal prefix                  : std_ulogic_vector(10 downto 0);
 	signal direction_bit           : std_ulogic;
 	signal regime_bits             : std_ulogic_vector(2 downto 0);
@@ -66,7 +66,7 @@ begin
 	           '0';
 end architecture behave;
 
-architecture rtl of common_decoder is
+architecture rtl of predecoder is
 	signal direction_bit                 : std_ulogic;
 	signal regime_characteristic_segment : std_ulogic_vector(9 downto 0);
 	signal regime_bits                   : std_ulogic_vector(2 downto 0);

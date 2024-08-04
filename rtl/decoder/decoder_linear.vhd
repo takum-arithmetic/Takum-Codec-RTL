@@ -23,7 +23,7 @@ architecture rtl of decoder_linear is
 	signal characteristic    : integer range -255 to 254;
 begin
 
-	common_decoder : entity work.common_decoder(rtl)
+	predecoder : entity work.predecoder(rtl)
 		generic map (
 			n => n
 		)

@@ -25,7 +25,7 @@ begin
 	characteristic <= exponent when sign_bit = '0' else
 	                  to_integer(signed(not(std_ulogic_vector(to_signed(exponent, 9)))));
 
-	common_encoder : entity work.common_encoder(rtl)
+	postencoder : entity work.postencoder(rtl)
 		generic map (
 			n => n
 		)
