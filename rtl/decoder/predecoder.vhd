@@ -5,16 +5,17 @@ library ieee;
 
 entity predecoder is
 	generic (
-		n : natural range 2 to natural'high := 16
+		n               : natural range 2 to natural'high := 16;
+		output_exponent : std_ulogic                      := '0'
 	);
 	port (
-		takum          : in    std_ulogic_vector(n - 1 downto 0);
-		sign_bit       : out   std_ulogic;
-		characteristic : out   integer range -255 to 254;
-		mantissa_bits  : out   std_ulogic_vector(n - 6 downto 0);
-		precision      : out   natural range 0 to n - 5;
-		is_zero        : out   std_ulogic;
-		is_nar         : out   std_ulogic
+		takum                      : in    std_ulogic_vector(n - 1 downto 0);
+		sign_bit                   : out   std_ulogic;
+		characteristic_or_exponent : out   integer range -255 to 254;
+		mantissa_bits              : out   std_ulogic_vector(n - 6 downto 0);
+		precision                  : out   natural range 0 to n - 5;
+		is_zero                    : out   std_ulogic;
+		is_nar                     : out   std_ulogic
 	);
 end entity predecoder;
 
@@ -47,8 +48,11 @@ begin
 
 	-- determine characteristic as per definition
 	characteristic_explicit <= to_integer(unsigned(prefix(6 downto 7 - regime)));
-	characteristic          <= -2 ** (regime + 1) + 1 + characteristic_explicit when direction_bit = '0' else
-	                           2 ** regime - 1 + characteristic_explicit;
+
+	-- If output_exponent is zero, we just want the characteristic, which is obtained by conditional negation,
+	-- but if output_exponent is one, we want the exponent, and thus both cases are inverted.
+	characteristic_or_exponent <= -2 ** (regime + 1) + 1 + characteristic_explicit when direction_bit = output_exponent else
+	                              2 ** regime - 1 + characteristic_explicit;
 
 	-- determine precision as per definition
 	precision_internal <= 0 when regime >= n - 5 else
@@ -104,8 +108,11 @@ begin
 	                                  not characteristic_raw_bits;
 		characteristic_precursor       <= std_ulogic_vector(shift_right(signed(std_ulogic_vector'("10" & characteristic_raw_normal_bits)), antiregime));
 		characteristic_normal          <= std_ulogic_vector'("1" & std_ulogic_vector(unsigned(characteristic_precursor(7 downto 0)) + 1));
-		characteristic                 <= to_integer(signed(characteristic_normal)) when direction_bit = '0' else
-	                                  to_integer(signed(not characteristic_normal));
+
+		-- If output_exponent is zero, we just want the characteristic, which is obtained by conditional negation,
+		-- but if output_exponent is one, we want the exponent, and thus both cases are inverted.
+		characteristic_or_exponent <= to_integer(signed(characteristic_normal)) when direction_bit = output_exponent else
+	                              to_integer(signed(not characteristic_normal));
 	end block determine_characteristic;
 
 	mantissa_bits <= std_ulogic_vector(shift_left(unsigned(takum(n - 6 downto 0)), regime));
@@ -117,9 +124,9 @@ begin
 		constant takum_nar  : std_ulogic_vector(n - 1 downto 0) := (n - 1 => '1', others => '0');
 	begin
 		is_zero <= '1' when takum = takum_zero else
-		           '0';
+	           '0';
 		is_nar  <= '1' when takum = takum_nar else
-		           '0';
+	           '0';
 	end block detect_special_cases;
 
 end architecture rtl;

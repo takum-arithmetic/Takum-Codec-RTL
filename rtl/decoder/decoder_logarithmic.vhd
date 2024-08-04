@@ -24,16 +24,17 @@ begin
 
 	predecoder : entity work.predecoder(rtl)
 		generic map (
-			n => n
+			n               => n,
+			output_exponent => '0'
 		)
 		port map (
-			takum          => takum,
-			sign_bit       => sign_bit,
-			characteristic => characteristic,
-			mantissa_bits  => mantissa_bits,
-			precision      => precision,
-			is_zero        => is_zero,
-			is_nar         => is_nar
+			takum                      => takum,
+			sign_bit                   => sign_bit,
+			characteristic_or_exponent => characteristic,
+			mantissa_bits              => mantissa_bits,
+			precision                  => precision,
+			is_zero                    => is_zero,
+			is_nar                     => is_nar
 		);
 
 	-- the barred logarithmic value is just c + m, i.e. the concatenation

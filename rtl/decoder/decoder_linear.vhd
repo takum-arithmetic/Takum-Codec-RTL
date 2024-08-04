@@ -19,32 +19,21 @@ entity decoder_linear is
 end entity decoder_linear;
 
 architecture rtl of decoder_linear is
-	signal sign_bit_internal : std_ulogic;
-	signal characteristic    : integer range -255 to 254;
 begin
 
 	predecoder : entity work.predecoder(rtl)
 		generic map (
-			n => n
+			n               => n,
+			output_exponent => '1'
 		)
 		port map (
-			takum          => takum,
-			sign_bit       => sign_bit_internal,
-			characteristic => characteristic,
-			mantissa_bits  => fraction_bits,
-			precision      => precision,
-			is_zero        => is_zero,
-			is_nar         => is_nar
+			takum                      => takum,
+			sign_bit                   => sign_bit,
+			characteristic_or_exponent => exponent,
+			mantissa_bits              => fraction_bits,
+			precision                  => precision,
+			is_zero                    => is_zero,
+			is_nar                     => is_nar
 		);
 
-	-- output sign
-	sign_bit <= sign_bit_internal;
-
-	-- the exponent is defined as (-1)^sign_bit * (characteristic + sign_bit),
-	-- which means that it's characteristic for sign_bit=0 and
-	-- (-characteristic - 1). However, the latter is just the result
-	-- of the bitwise negation of the corresponding two's complement
-	-- signed integer.
-	exponent <= characteristic when sign_bit_internal = '0' else
-	            to_integer(signed(not(std_ulogic_vector(to_signed(characteristic, 9)))));
 end architecture rtl;
