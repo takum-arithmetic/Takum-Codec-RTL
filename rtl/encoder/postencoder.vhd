@@ -5,7 +5,7 @@ library ieee;
 
 entity postencoder is
 	generic (
-		n : natural range 2 to natural'high := 16
+		n : natural range 2 to natural'high := 32
 	);
 	port (
 		sign_bit       : in    std_ulogic;
@@ -101,15 +101,15 @@ begin
 		characteristic_precursor <= std_ulogic_vector(to_unsigned(to_integer(unsigned(characteristic_normal)) + 1, 8));
 	end block determine_characteristic_precursor;
 
-	count_leading_zeroes_8 : block is
-		signal input    : std_ulogic_vector(7 downto 0);
-		signal offset   : natural range 0 to 7;
-		signal log_low  : natural range 0 to 3;
-		signal log_high : natural range 0 to 3;
+	detect_leading_one_8 : block is
+		signal input              : std_ulogic_vector(7 downto 0);
+		signal leading_one_offset : natural range 0 to 7;
+		signal lod4_low           : natural range 0 to 3;
+		signal lod4_high          : natural range 0 to 3;
 
-		type log_lut_type is array (0 to 15) of natural range 0 to 3;
+		type lod4_lut_type is array (0 to 15) of natural range 0 to 3;
 
-		constant log_lut : log_lut_type :=
+		constant lod4_lut : lod4_lut_type :=
 		(
 		  0, -- 0000
 		  0, -- 0001
@@ -131,13 +131,13 @@ begin
 	begin
 		input <= characteristic_precursor;
 
-		log_low  <= log_lut(to_integer(unsigned(input(3 downto 0))));
-		log_high <= log_lut(to_integer(unsigned(input(7 downto 4))));
-		offset   <= log_low when input(7 downto 4) = "0000" else
-	            to_integer(unsigned('1' & std_ulogic_vector(to_unsigned(log_high, 2))));
+		lod4_low           <= lod4_lut(to_integer(unsigned(input(3 downto 0))));
+		lod4_high          <= lod4_lut(to_integer(unsigned(input(7 downto 4))));
+		leading_one_offset <= lod4_low when input(7 downto 4) = "0000" else
+	                      to_integer(unsigned('1' & std_ulogic_vector(to_unsigned(lod4_high, 2))));
 
-		regime <= offset;
-	end block count_leading_zeroes_8;
+		regime <= leading_one_offset;
+	end block detect_leading_one_8;
 
 	generate_takum_with_rounding_bit : block is
 		signal regime_bits                  : std_ulogic_vector(2 downto 0);
