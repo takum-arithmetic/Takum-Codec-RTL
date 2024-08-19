@@ -1,1 +1,6 @@
-Takum HDL
+Takum HDL - A Takum Hardware Codec implemented in VHDL
+
+This repository contains a full decoder and encoder for the default
+logarithmic and the linear takum arithmetic formats. Besides the
+RTL descriptions the repository also contains full simulation testbenches
+to verify behaviour.
