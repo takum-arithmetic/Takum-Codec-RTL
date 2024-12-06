@@ -99,7 +99,7 @@ begin
 
 	characteristic_raw_bits <= regime_characteristic_segment(6 downto 0);
 
-	determine_characteristic : block is
+	determine_characteristic_or_exponent : block is
 		signal characteristic_raw_normal_bits : std_ulogic_vector(6 downto 0);
 		signal characteristic_precursor       : std_ulogic_vector(8 downto 0);
 		signal characteristic_normal          : std_ulogic_vector(8 downto 0);
@@ -113,7 +113,7 @@ begin
 		-- but if output_exponent is one, we want the exponent, and thus both cases are inverted.
 		characteristic_or_exponent <= to_integer(signed(characteristic_normal)) when direction_bit = output_exponent else
 	                              to_integer(signed(not characteristic_normal));
-	end block determine_characteristic;
+	end block determine_characteristic_or_exponent;
 
 	mantissa_bits <= std_ulogic_vector(shift_left(unsigned(takum(n - 6 downto 0)), regime));
 	precision     <= (n - 5) - regime when regime < n - 5 else
