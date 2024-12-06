@@ -21,7 +21,7 @@ architecture rtl of postencoder is
 	signal direction_bit            : std_ulogic;
 	signal characteristic_precursor : std_ulogic_vector(7 downto 0);
 	signal regime                   : natural range 0 to 7;
-	signal takum_with_rounding_bit  : std_ulogic_vector(n downto 0);
+	signal extended_takum           : std_ulogic_vector(n + 6 downto 0);
 	signal takum_rounded            : std_ulogic_vector(n - 1 downto 0);
 	signal round_up_overflows       : std_ulogic;
 	signal round_down_underflows    : std_ulogic;
@@ -139,7 +139,7 @@ begin
 		regime <= leading_one_offset;
 	end block detect_leading_one_8;
 
-	generate_takum_with_rounding_bit : block is
+	generate_extended_takum : block is
 		signal regime_bits                  : std_ulogic_vector(2 downto 0);
 		signal characteristic_bits          : std_ulogic_vector(6 downto 0);
 		signal characteristic_mantissa_bits : std_ulogic_vector(n + 8 downto 0);
@@ -157,17 +157,20 @@ begin
 		end process set_regime_and_characteristic_raw_bits;
 
 		characteristic_mantissa_bits <= std_ulogic_vector(shift_right(unsigned(std_ulogic_vector'(characteristic_bits & mantissa_bits & (6 downto 0 => '0'))), regime));
-		takum_with_rounding_bit      <= sign_bit & direction_bit & regime_bits & characteristic_mantissa_bits(n + 1 downto 6);
-	end block generate_takum_with_rounding_bit;
+		extended_takum               <= sign_bit & direction_bit & regime_bits & characteristic_mantissa_bits(n + 1 downto 0);
+	end block generate_extended_takum;
 
 	round : block is
 		signal takum_rounded_up   : std_ulogic_vector(n - 1 downto 0);
 		signal takum_rounded_down : std_ulogic_vector(n - 1 downto 0);
+		signal is_rest_zero       : std_ulogic;
 	begin
-		takum_rounded_up   <= std_ulogic_vector(to_unsigned(to_integer(unsigned(takum_with_rounding_bit(n downto 1))) + 1, n));
-		takum_rounded_down <= takum_with_rounding_bit(n downto 1);
+		takum_rounded_up   <= std_ulogic_vector(to_unsigned(to_integer(unsigned(extended_takum(n + 6 downto 7))) + 1, n));
+		takum_rounded_down <= extended_takum(n + 6 downto 7);
+		is_rest_zero       <= '1' when extended_takum(5 downto 0) = "000000" else
+	                      '0';
 
-		takum_rounded <= takum_rounded_up when (round_up_overflows = '0' and (takum_with_rounding_bit(0) = '1' or round_down_underflows = '1')) else
+		takum_rounded <= takum_rounded_up when (round_up_overflows = '0' and extended_takum(6) = '1' and (is_rest_zero = '0' or extended_takum(7) = '1')) else
 	                 takum_rounded_down;
 	end block round;
 
