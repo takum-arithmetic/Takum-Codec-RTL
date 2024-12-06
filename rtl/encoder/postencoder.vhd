@@ -36,8 +36,23 @@ begin
 
 		type characteristic_bound_type is array (2 to 11) of natural range 15 to 254;
 
-		constant characteristic_bound : characteristic_bound_type :=
+		constant characteristic_underflow_bound : characteristic_bound_type :=
 		(
+		  -1,
+		  -16,
+		  -64,
+		  -128,
+		  -192,
+		  -224,
+		  -240,
+		  -248,
+		  -252,
+		  -254,
+		);
+
+		constant characteristic_overflow_bound : characteristic_bound_type :=
+		(
+		  0,
 		  15,
 		  63,
 		  127,
@@ -46,8 +61,7 @@ begin
 		  239,
 		  247,
 		  251,
-		  253,
-		  254
+		  253
 		);
 	begin
 		mantissa_bits_crop <= mantissa_bits(n - 6 downto 6);
@@ -55,13 +69,13 @@ begin
 		check_characteristic : process (characteristic, mantissa_bits_crop) is
 		begin
 			if (n <= 11) then
-				if (characteristic < -characteristic_bound(n)) then
+				if (characteristic <= characteristic_underflow_bound(n)) then
 					round_down_underflows <= '1';
 				else
 					round_down_underflows <= '0';
 				end if;
 
-				if (characteristic >= characteristic_bound(n)) then
+				if (characteristic >= characteristic_overflow_bound(n)) then
 					round_up_overflows <= '1';
 				else
 					round_up_overflows <= '0';
