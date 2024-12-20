@@ -5,7 +5,7 @@ library ieee;
 
 entity decoder_logarithmic is
 	generic (
-		n : natural range 2 to natural'high := 16
+		n : natural range 2 to natural'high
 	);
 	port (
 		takum                    : in    std_ulogic_vector(n - 1 downto 0);

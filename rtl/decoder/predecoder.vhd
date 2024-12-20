@@ -5,8 +5,8 @@ library ieee;
 
 entity predecoder is
 	generic (
-		n               : natural range 2 to natural'high := 16;
-		output_exponent : std_ulogic                      := '0'
+		n               : natural range 2 to natural'high;
+		output_exponent : std_ulogic
 	);
 	port (
 		takum                      : in    std_ulogic_vector(n - 1 downto 0);

@@ -5,7 +5,7 @@ library ieee;
 
 entity encoder_linear is
 	generic (
-		n : natural range 2 to natural'high := 16
+		n : natural range 2 to natural'high
 	);
 	port (
 		sign_bit      : in    std_ulogic;
