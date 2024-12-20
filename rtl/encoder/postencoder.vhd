@@ -5,7 +5,7 @@ library ieee;
 
 entity postencoder is
 	generic (
-		n : natural range 2 to natural'high := 32
+		n : natural range 2 to natural'high
 	);
 	port (
 		sign_bit       : in    std_ulogic;
@@ -34,7 +34,7 @@ begin
 		constant mantissa_bits_crop_zero : std_ulogic_vector(n - 12 downto 0) := (others => '0');
 		constant mantissa_bits_crop_one  : std_ulogic_vector(n - 12 downto 0) := (others => '1');
 
-		type characteristic_bound_type is array (2 to 11) of natural range 15 to 254;
+		type characteristic_bound_type is array (2 to 11) of integer range -254 to 253;
 
 		constant characteristic_underflow_bound : characteristic_bound_type :=
 		(
@@ -47,7 +47,7 @@ begin
 		  -240,
 		  -248,
 		  -252,
-		  -254,
+		  -254
 		);
 
 		constant characteristic_overflow_bound : characteristic_bound_type :=
@@ -184,7 +184,7 @@ begin
 		is_rest_zero       <= '1' when extended_takum(5 downto 0) = "000000" else
 	                      '0';
 
-		takum_rounded <= takum_rounded_up when (round_up_overflows = '0' and extended_takum(6) = '1' and (is_rest_zero = '0' or extended_takum(7) = '1')) else
+		takum_rounded <= takum_rounded_up when ((round_down_underflows = '1') or (round_up_overflows = '0' and extended_takum(6) = '1' and (is_rest_zero = '0' or extended_takum(7) = '1'))) else
 	                 takum_rounded_down;
 	end block round;
 
