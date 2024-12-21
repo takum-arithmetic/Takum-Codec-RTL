@@ -8,4 +8,4 @@ In addition to the RTL descriptions in `rtl/`, the repository includes full simu
 
 This project is developed by Laslo Hunhold and licensed under the ISC license, except `rtl/third_party/`. See LICENSE for copyright and license details.
 
-The reference implementations in `rtl/third_party/` are licensed under the GNU GPLv3 and authors are listed in the respective source files.
+The posit codecs in `rtl/third_party/` are licensed under the GNU GPLv3 and authors are listed in the respective source files.
